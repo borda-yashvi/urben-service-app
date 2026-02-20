@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
 import Device from '../models/Device';
@@ -45,22 +44,21 @@ export async function forgotPassword(req: Request, res: Response) {
     const { email } = req.body;
     const user = await User.findOne({ email });
     if (!user) return res.status(200).json({ message: 'If account exists, reset token sent' });
-    const token = crypto.randomBytes(20).toString('hex');
-    user.resetToken = token;
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    user.resetToken = otp;
     user.resetExpires = new Date(Date.now() + Number(process.env.RESET_TOKEN_EXPIRES || 3600000));
     await user.save();
-        try {
-        await sendResetEmail(user.email, token);
+    try {
+        await sendResetEmail(user.email, otp);
     } catch (err) {
         console.error('Email send failed', err);
     }
-    // In real app, send email. Here we return token for convenience.
-    return res.json({ message: 'Reset token generated', token });
+    return res.json({ message: 'Reset OTP generated and emailed if configured' });
 }
 
 export async function resetPassword(req: Request, res: Response) {
-    const { token, password } = req.body;
-    const user = await User.findOne({ resetToken: token, resetExpires: { $gt: new Date() } });
+    const { otp, password } = req.body as { otp: string; password: string };
+    const user = await User.findOne({ resetToken: otp, resetExpires: { $gt: new Date() } });
     if (!user) return res.status(400).json({ message: 'Invalid or expired token' });
     user.password = password;
     user.resetToken = undefined as any;

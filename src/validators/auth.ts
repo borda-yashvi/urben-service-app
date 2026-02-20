@@ -21,7 +21,7 @@ export const loginSchema = z.object({
 }).merge(deviceSchema);
 
 export const forgotSchema = z.object({ email: z.string().email() });
-export const resetSchema = z.object({ token: z.string(), password: z.string().min(6) });
+export const resetSchema = z.object({ otp: z.string().regex(/^\d{6}$/, 'OTP must be 6 digits'), password: z.string().min(6) });
 
 export const logoutSchema = z.object({ device_id: z.string().min(1) });
 

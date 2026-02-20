@@ -21,15 +21,13 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-export async function sendResetEmail(to: string, token: string) {
-    const frontUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-    const resetLink = `${frontUrl}/reset-password?token=${token}`;
+export async function sendResetEmail(to: string, otp: string) {
     const info = await transporter.sendMail({
         from: process.env.EMAIL_FROM || user,
         to,
-        subject: 'Password reset',
-        text: `You requested a password reset. Use this token or visit ${resetLink}. Token: ${token}`,
-        html: `<p>You requested a password reset.</p><p>Click <a href="${resetLink}">here</a> to reset your password.</p><p>Or use this token: <code>${token}</code></p>`
+        subject: 'Your password reset OTP',
+        text: `Your password reset OTP is: ${otp}. It expires in ${Number(process.env.RESET_TOKEN_EXPIRES || 3600000) / 60000} minutes.`,
+        html: `<p>Your password reset OTP is:</p><h2>${otp}</h2><p>It expires in ${Number(process.env.RESET_TOKEN_EXPIRES || 3600000) / 60000} minutes.</p>`
     });
     return info;
 }
