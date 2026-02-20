@@ -29,7 +29,6 @@
         "@types/node": "^20.4.2",
         "@types/mongoose": "^5.11.97",
         "@types/nodemailer": "^6.4.7",
-        "@types/jsonwebtoken": "^8.5.11",
         "@types/node-cron": "^2.0.3",
         "@types/bcrypt": "^5.0.0",
         "@types/multer": "^1.4.7"
